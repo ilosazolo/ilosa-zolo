@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ilosa Zolo</title>
+    <!-- Garamond Font Loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Styling & Cozy Dark Aesthetic */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            font-family: 'EB Garamond', serif;
+            background-color: #0a0a0a;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+        /* Starry Background Container */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            background-color: #050505;
+        }
+        /* Content Wrapper */
+        .site-container {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 400;
+            font-style: italic;
+            letter-spacing: 1px;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255,255,255,0.1);
+        }
+        /* Secret Writing Panel (Hidden by default) */
+        #adminPanel {
+            display: none;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.5s ease forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            margin-bottom: 8px;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            padding: 12px;
+            color: #ffffff;
+            font-family: 'EB Garamond', serif;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        /* Canvas Sketchpad Design */
+        .canvas-container {
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: #111111;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        #drawingCanvas {
+            display: block;
+            background: #111111;
+            cursor: crosshair;
+            width: 100%;
+            height: 250px;
+        }
+        .canvas-controls {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: right;
+        }
+        .form-btn {
+            font-family: 'EB Garamond', serif;
+            font-size: 1.1rem;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .secondary-btn {
+            background: transparent;
+            color: #909090;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .secondary-btn:hover {
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        .main-submit-btn {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 14px;
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+        .main-submit-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        /* Archive List View */
+        #feedSection {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .journal-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(2px);
+        }
+        .journal-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .journal-header {
+            padding: 20px 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        .entry-title {
+            font-size: 1.4rem;
+            font-weight: 500;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+        .entry-date {
+            font-size: 1rem;
+            color: #666666;
+            font-style: italic;
+        }
+        .journal-body {
+            max-height: 0;
+            padding: 0 24px;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0, 1, 0, 1);
+            text-align: left;
+            border-top: 1px solid transparent;
+        }
+        .journal-card.expanded .journal-body {
+            max-height: 3000px;
+            padding: 24px;
+            opacity: 1;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.4s cubic-bezier(1, 0, 1, 0);
+        }
+        .body-text {
+            font-size: 1.25rem;
+            line-height: 1.8;
+            color: #cccccc;
+            white-space: pre-wrap;
+        }
+        .saved-art-wrapper {
+            margin-top: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: #111111;
+            border-radius: 4px;
+            max-width: 450px;
+            overflow: hidden;
+        }
+        .saved-art-img {
+            display: block;
+            width: 100%;
+            height: auto;
+            mix-blend-mode: screen;
+        }
+        /* Aesthetic Social Icons Block */
+        .social-container {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 50px;
+            margin-bottom: 10px;
+        }
+        .social-link {
+            color: rgba(255, 255, 255, 0.4);
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        .social-link:hover {
+            color: #ffffff;
+            transform: translateY(-2px);
+            filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));
+        }
+        .social-link svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+        /* Footer Styling */
+        footer {
+            margin-top: auto;
+            padding-top: 40px;
+            text-align: center;
+            font-size: 1.05rem;
+            color: #555555;
+            width: 100%;
+            letter-spacing: 0.5px;
+        }
+        .secret-trigger {
+            color: #555555;
+            text-decoration: none;
+            cursor: default;
+        }
+        .copyright {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            color: #444444;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Moving Stars Background -->
+    <div id="particles-js"></div>
+
+    <div class="site-container">
+        <header>
+            <h1>Ilosa Zolo</h1>
+        </header>
+
+        <!-- PRIVATE ADMIN WRITING STUDIO (Hidden until unlocked) -->
+        <main id="adminPanel">
+            <div class="form-group">
+                <label>Title of entry</label>
+                <input type="text" id="postTitle" placeholder="Labeling the thought...">
+            </div>
+            <div class="form-group">
+                <label>Write your thoughts...</label>
+                <textarea id="postContent" rows="8" placeholder="Begin writing..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Sketchpad attachment (Optional)</label>
+                <div class="canvas-container">
+                    <canvas id="drawingCanvas" width="500" height="250"></canvas>
+                    <div class="canvas-controls">
+                        <button type="button" class="form-btn secondary-btn" onclick="clearCanvas()">Reset Sketch</button>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="form-btn main-submit-btn" onclick="publishEntry()">Commit to Archive</button>
+        </main>
+
+        <!-- PUBLIC ARCHIVE FEED -->
+        <section id="feedSection">
+            <div style="text-align:center; color:#666; font-style:italic; font-size:1.2rem;">Reading archive...</div>
+        </section>
+
+        <!-- AESTHETIC WHITE LOGO SOCIAL LINKS -->
+        <div class="social-container">
+            <!-- Instagram -->
+            <a href="https://instagram.com/ilosazolo" target="_blank" class="social-link" title="Instagram">
+                <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+            </a>
+            <!-- TikTok -->
+            <a href="https://tiktok.com/@ilosazolo" target="_blank" class="social-link" title="TikTok">
+                <svg viewBox="0 0 24 24"><path d="M12.525.02c1.31.01 2.61.03 3.91.05.08 1.53.63 3.01 1.61 4.18 1.13 1.24 2.7 2.01 4.36 2.23v3.83c-1.39-.03-2.77-.39-3.99-1.07-.63-.35-1.2-.81-1.68-1.35v6.52c0 2.21-.69 4.37-1.99 6.15-2.03 2.64-5.38 3.96-8.68 3.41-3.15-.5-5.83-2.83-6.77-5.92-.99-3.32.18-7.05 2.92-9.15 1.76-1.32 3.96-1.92 6.16-1.65v3.91c-1.2-.19-2.45.12-3.39.91-.97.83-1.44 2.13-1.22 3.38.25 1.45 1.42 2.64 2.86 2.91 1.34.23 2.75-.24 3.52-1.35.39-.58.59-1.27.58-1.97V0l.1-.02z"/></svg>
+            </a>
+            <!-- YouTube -->
+            <a href="https://youtube.com/@ilosazolo" target="_blank" class="social-link" title="YouTube">
+                <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            </a>
+            <!-- Medium -->
+            <a href="https://medium.com/@ilosazolo" target="_blank" class="social-link" title="Medium">
+                <svg viewBox="0 0 24 24"><path d="M13.54 12a6.8 6.8 0 1 1-13.54 0 6.8 6.8 0 0 1 13.54 0zm7.42 0c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42zm3.04 0c0 3.21-.32 5.82-.72 5.82s-.72-2.61-.72-5.82.32-5.82.72-5.82.72 2.61.72 5.82z"/></svg>
+            </a>
+        </div>
+
+        <footer>
+            <p>made by <span class="secret-trigger" onclick="unlockDesk()">ilosazolo</span></p>
+            <div class="copyright">&copy; 2026</div>
+        </footer>
+    </div>
+
+    <!-- Background Engine Integration -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Reuse your working configuration smoothly
+        const firebaseConfig = {
+            apiKey: "AIzaSyBrsqAcI4TbTKPiRzhd-VrhXQJTr7Lzzd8",
+            authDomain: "graveyard-words.firebaseapp.com",
+            projectId: "graveyard-words",
+            storageBucket: "graveyard-words.firebasestorage.app",
+            messagingSenderId: "915982371340",
+            appId: "1:915982371340:web:a4d2b04dc5c8c913f57c29",
+            measurementId: "G-YSE5EEKV9L"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- SECRET UNLOCK GATEWAY ---
+        window.unlockDesk = function() {
+            const pass = prompt("Enter password to access writing desk:");
+            if (pass === "ilosa2026") {
+                document.getElementById('adminPanel').style.display = "block";
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                alert("Welcome back, Ilosa.");
+            } else if (pass !== null) {
+                alert("Access Denied.");
+            }
+        }
+
+        // --- DRAWING CANVAS LOGIC ---
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        canvas.addEventListener('mousedown', (e) => { isDrawing = true; draw(e); });
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', () => { isDrawing = false; ctx.beginPath(); });
+        canvas.addEventListener('mouseleave', () => { isDrawing = false; ctx.beginPath(); });
+        
+        canvas.addEventListener('touchstart', (e) => { isDrawing = true; draw(e.touches[0]); e.preventDefault(); });
+        canvas.addEventListener('touchmove', (e) => { draw(e.touches[0]); e.preventDefault(); });
+        canvas.addEventListener('touchend', () => { isDrawing = false; ctx.beginPath(); });
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+
+        window.clearCanvas = function() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function isCanvasBlank() {
+            const blank = document.createElement('canvas');
+            blank.width = canvas.width;
+            blank.height = canvas.height;
+            return canvas.toDataURL() === blank.toDataURL();
+        }
+
+        // --- SUBMIT WORK TO SEPARATE FOLDER ("writings") ---
+        window.publishEntry = async function() {
+            const title = document.getElementById('postTitle').value.trim();
+            const content = document.getElementById('postContent').value.trim();
+
+            if (!title || !content) {
+                alert("Fields cannot be blank.");
+                return;
+            }
+
+            let artDataURL = "";
+            if (!isCanvasBlank()) {
+                artDataURL = canvas.toDataURL();
+            }
+
+            try {
+                await addDoc(collection(db, "writings"), {
+                    title: title,
+                    content: content,
+                    art: artDataURL,
+                    timestamp: new Date()
+                });
+
+                alert("Entry permanently committed to archive.");
+                
+                // Clear fields
+                document.getElementById('postTitle').value = "";
+                document.getElementById('postContent').value = "";
+                clearCanvas();
+                
+                // Hide panel again & reload feed
+                document.getElementById('adminPanel').style.display = "none";
+                loadArchive();
+
+            } catch (error) {
+                console.error("Database save crash: ", error);
+                alert("Error committing entry.");
+            }
+        }
+
+        // --- READ MODE: RENDER ARCHIVES ---
+        async function loadArchive() {
+            const container = document.getElementById('feedSection');
+            try {
+                const q = query(collection(db, "writings"), orderBy("timestamp", "desc"));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    container.innerHTML = '<div style="text-align:center; color:#555; font-style:italic; font-size:1.2rem;">The archive collection is currently empty.</div>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    
+                    // Format pristine dates elegantly
+                    let dateString = "";
+                    if (data.timestamp) {
+                        const dateObj = data.timestamp.toDate();
+                        dateString = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    }
+
+                    const card = document.createElement('div');
+                    card.className = 'journal-card';
+                    
+                    let imageElement = data.art ? `<div class="saved-art-wrapper"><img src="${data.art}" class="saved-art-img" /></div>` : '';
+
+                    card.innerHTML = `
+                        <div class="journal-header" onclick="toggleCard(this)">
+                            <span class="entry-title">${data.title}</span>
+                            <span class="entry-date">${dateString}</span>
+                        </div>
+                        <div class="journal-body">
+                            <p class="body-text">${data.content.replace(/\n/g, '<br>')}</p>
+                            ${imageElement}
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error("Fetch failure: ", error);
+                container.innerHTML = '<div style="text-align:center; color:#555;">Failed to safely reach the database archive.</div>';
+            }
+        }
+
+        window.toggleCard = function(el) {
+            el.parentElement.classList.toggle('expanded');
+        }
+
+        // Load archive records instantly on load
+        loadArchive();
+
+        // Particles Background Parameters
+        particlesJS('particles-js', {
+            "particles": {
+                "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#ffffff" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.4, "random": true, "anim": { "enable": true, "speed": 0.5, "opacity_min": 0.1, "sync": false } },
+                "size": { "value": 1.5, "random": true, "anim": { "enable": true, "speed": 1, "size_min": 0.5, "sync": false } },
+                "line_linked": { "enable": false },
+                "move": { "enable": true, "speed": 0.2, "direction": "none", "random": true, "straight": false, "out_mode": "out", "bounce": false }
+            },
+            "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": false }, "onclick": { "enable": false } } },
+            "retina_detect": true
+        });
+    </script>
+</body>
+</html>
